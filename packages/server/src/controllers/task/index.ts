@@ -3,7 +3,7 @@ import { EntityNotFoundError } from 'typeorm/error/EntityNotFoundError';
 import { getTaskRepository } from '../../db/repositories/task';
 import { RouterContext } from 'koa-router';
 import { Task } from '../../db/models/task';
-import { NotFoundError } from '../../errors';
+import { NotFoundError, DataValidationError } from '../../errors';
 
 export async function getTasks(ctx: Koa.Context) {
   const taskRepository = await getTaskRepository();
@@ -35,13 +35,24 @@ export async function addTask(
   const taskRepository = await getTaskRepository();
   try {
     let taskData: Partial<Task> = ctx.request.body;
+
+    if (!taskData.title) {
+      // TODO: replace with validation middleware
+      throw new DataValidationError('Title is required');
+    }
+
     const task = await taskRepository.save(taskData);
     ctx.body = task;
     ctx.res.statusCode = 201;
     return next();
-  } catch {
-    ctx.body = 'Adding new task error';
-    ctx.res.statusCode = 500;
+  } catch (error) {
+    if (error instanceof DataValidationError) {
+      ctx.body = error.message;
+      ctx.res.statusCode = 400;
+    } else {
+      ctx.body = 'Adding new task error';
+      ctx.res.statusCode = 500;
+    }
   }
 }
 
@@ -54,7 +65,6 @@ export async function updateTask(
     let updateData: Partial<Task> = ctx.request.body;
     const id = ctx.params.id; // TODO: find the way to typing params
     let task = await taskRepository.findOneOrFail(id);
-    console.log(task);
     task = { ...task, ...updateData };
     task = await taskRepository.save(task);
     ctx.body = task;
@@ -82,7 +92,7 @@ export async function deleteTask(
     if (!deleteResult.affected) {
       throw new NotFoundError('Task not found');
     }
-    ctx.res.statusCode = 200;
+    ctx.res.statusCode = 204;
     return next();
   } catch (error) {
     if (error instanceof NotFoundError) {

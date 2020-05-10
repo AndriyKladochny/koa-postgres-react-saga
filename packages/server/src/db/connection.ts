@@ -1,14 +1,14 @@
 import { createConnection, Connection } from 'typeorm';
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
 
-let connection: Connection;
+const DB_NAME = process.env.DB_NAME || 'todo';
 
-console.log(__dirname);
+let connection: Connection;
 
 export const config: PostgresConnectionOptions = {
   type: 'postgres',
   host: 'localhost',
-  database: 'todo',
+  database: DB_NAME,
   username: 'appuser',
   password: 'password',
   synchronize: false,

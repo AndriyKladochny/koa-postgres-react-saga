@@ -7,7 +7,8 @@
     "connect": "ts-node ./src/db/connection",
     "migrate": "ts-node ./node_modules/.bin/typeorm migration:run --config src/db/migrations-config",
     "migrate:revert": "ts-node ./node_modules/.bin/typeorm migration:revert --config src/db/migrations-config",
-    "migrate:generate": "ts-node ./node_modules/.bin/typeorm migration:generate --config src/db/migrations-config -n"
+    "migrate:generate": "ts-node ./node_modules/.bin/typeorm migration:generate --config src/db/migrations-config -n",
+    "test:integration": "DB_NAME=todo_test yarn migrate && DB_NAME=todo_test jest test/integration"
   },
   "dependencies": {
     "koa": "^2.11.0",
@@ -18,10 +19,15 @@
     "typeorm": "^0.2.24"
   },
   "devDependencies": {
+    "@types/jest": "^25.2.1",
     "@types/koa": "^2.11.3",
     "@types/koa-bodyparser": "^4.3.0",
     "@types/koa-router": "^7.4.0",
     "@types/node": "^13.13.0",
+    "@types/supertest": "^2.0.9",
+    "jest": "^25.5.4",
+    "supertest": "^4.0.2",
+    "ts-jest": "^25.4.0",
     "ts-node-dev": "^1.0.0-pre.44"
   }
 }
