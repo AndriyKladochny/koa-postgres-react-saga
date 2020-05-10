@@ -9,7 +9,7 @@ export async function getTasks(ctx: Koa.Context) {
   const taskRepository = await getTaskRepository();
   const tasks = await taskRepository.find();
   ctx.body = tasks;
-  ctx.res.statusCode = 200;
+  ctx.status = 200;
 }
 
 export async function getTask(
@@ -21,11 +21,11 @@ export async function getTask(
   const task = await taskRepository.findOne(id);
   if (task) {
     ctx.body = task;
-    ctx.res.statusCode = 200;
+    ctx.status = 200;
     return next();
   }
 
-  ctx.res.statusCode = 404;
+  ctx.status = 404;
 }
 
 export async function addTask(
@@ -43,15 +43,15 @@ export async function addTask(
 
     const task = await taskRepository.save(taskData);
     ctx.body = task;
-    ctx.res.statusCode = 201;
+    ctx.status = 201;
     return next();
   } catch (error) {
     if (error instanceof DataValidationError) {
       ctx.body = error.message;
-      ctx.res.statusCode = 400;
+      ctx.status = 400;
     } else {
       ctx.body = 'Adding new task error';
-      ctx.res.statusCode = 500;
+      ctx.status = 500;
     }
   }
 }
@@ -68,15 +68,15 @@ export async function updateTask(
     task = { ...task, ...updateData };
     task = await taskRepository.save(task);
     ctx.body = task;
-    ctx.res.statusCode = 200;
+    ctx.status = 200;
     return next();
   } catch (error) {
     if (error instanceof EntityNotFoundError) {
       ctx.body = error.message;
-      ctx.res.statusCode = 404;
+      ctx.status = 404;
     } else {
       ctx.body = 'Updating task error';
-      ctx.res.statusCode = 500;
+      ctx.status = 500;
     }
   }
 }
@@ -92,15 +92,15 @@ export async function deleteTask(
     if (!deleteResult.affected) {
       throw new NotFoundError('Task not found');
     }
-    ctx.res.statusCode = 204;
+    ctx.status = 204;
     return next();
   } catch (error) {
     if (error instanceof NotFoundError) {
       ctx.body = error.message;
-      ctx.res.statusCode = 404;
+      ctx.status = 404;
     } else {
       ctx.body = 'Deleting task error';
-      ctx.res.statusCode = 500;
+      ctx.status = 500;
     }
   }
 }
