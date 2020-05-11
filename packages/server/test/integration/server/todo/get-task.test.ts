@@ -5,6 +5,7 @@ import {
   getTaskRepository,
   TaskRepository,
 } from '../../../../src/db/repositories/task';
+import { Task } from '../../../../src/db/models/task';
 
 const server = app.listen();
 const request = supertest(server);
@@ -68,7 +69,8 @@ describe('Todo API', () => {
 
       const res = await request.post(`/_api/todo`).send(taskData).expect(400);
       // Why error is not in body?
-      expect(res.text).toEqual('Title is required');
+      expect(res.text).toMatch(/title/gi);
+      expect(res.text).toMatch(/is required/gi);
     });
 
     test('should return 500 error when saving to DB throws error', async () => {
@@ -76,30 +78,33 @@ describe('Todo API', () => {
       jest.spyOn(taskRepository, 'save').mockRejectedValueOnce('Custom error');
       const res = await request.post(`/_api/todo`).send(taskData).expect(500);
       // Why error is not in body?
-      expect(res.text).toEqual('Adding new task error');
+      expect(res.text).toEqual('Internal Server Error');
     });
   });
 
   describe('PATCH /_api/todo/:id', () => {
-    test('should update task title', async () => {
+    test('should update task title and isDone', async () => {
       const task = await taskRepository.save({
         title: 'Write integration tests',
       });
-      const updatedTitle = 'Write integration tests UPD';
+      const updatedTaskProps: Partial<Task> = {
+        title: 'Write integration tests UPD',
+        isDone: true,
+      };
       const res = await request
         .patch(`/_api/todo/${task.id}`)
-        .send({ title: updatedTitle })
+        .send(updatedTaskProps)
         .expect(200);
 
-      expect(res.body.title).toEqual(updatedTitle);
+      expect(res.body).toMatchObject(updatedTaskProps);
     });
 
     test(`should return 404 when we are updating not existed task`, async () => {
-      const updatedTitle = 'Write integration tests UPD';
-      await request
-        .patch(`/_api/todo/0`)
-        .send({ title: updatedTitle })
-        .expect(404);
+      const updatedTaskProps: Partial<Task> = {
+        title: 'Write integration tests UPD',
+        isDone: true,
+      };
+      await request.patch(`/_api/todo/0`).send(updatedTaskProps).expect(404);
     });
 
     test('should return 500 error when saving to DB throws error', async () => {
@@ -109,15 +114,18 @@ describe('Todo API', () => {
 
       jest.spyOn(taskRepository, 'save').mockRejectedValueOnce('Custom error');
 
-      const updatedTitle = 'Write integration tests UPD';
+      const updatedTaskProps: Partial<Task> = {
+        title: 'Write integration tests UPD',
+        isDone: true,
+      };
 
       const res = await request
         .patch(`/_api/todo/${task.id}`)
-        .send({ title: updatedTitle })
+        .send(updatedTaskProps)
         .expect(500);
 
       // Why error is not in body?
-      expect(res.text).toEqual('Updating task error');
+      expect(res.text).toEqual('Internal Server Error');
     });
   });
 
@@ -146,7 +154,7 @@ describe('Todo API', () => {
         .mockRejectedValueOnce('Custom error');
       const res = await request.delete(`/_api/todo/${task.id}`).expect(500);
       // Why error is not in body?
-      expect(res.text).toEqual('Deleting task error');
+      expect(res.text).toEqual('Internal Server Error');
     });
   });
 });

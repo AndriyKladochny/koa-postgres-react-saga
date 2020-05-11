@@ -1,10 +1,12 @@
 import Koa from 'koa';
 import bodyParser from 'koa-bodyparser';
 import router from './routes';
+import { errorHandler } from './middlewares';
 
 const app = new Koa();
 
 app.use(bodyParser());
+app.use(errorHandler);
 app.use(router.routes());
 app.use(router.allowedMethods());
 

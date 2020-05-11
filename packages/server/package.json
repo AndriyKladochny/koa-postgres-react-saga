@@ -11,6 +11,7 @@
     "test:integration": "DB_NAME=todo_test yarn migrate && DB_NAME=todo_test jest test/integration"
   },
   "dependencies": {
+    "@hapi/joi": "^17.1.1",
     "koa": "^2.11.0",
     "koa-bodyparser": "^4.3.0",
     "koa-router": "^8.0.8",
@@ -19,6 +20,7 @@
     "typeorm": "^0.2.24"
   },
   "devDependencies": {
+    "@types/hapi__joi": "^17.1.0",
     "@types/jest": "^25.2.1",
     "@types/koa": "^2.11.3",
     "@types/koa-bodyparser": "^4.3.0",
