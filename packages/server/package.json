@@ -8,6 +8,7 @@
     "migrate": "ts-node ./node_modules/.bin/typeorm migration:run --config src/db/migrations-config",
     "migrate:revert": "ts-node ./node_modules/.bin/typeorm migration:revert --config src/db/migrations-config",
     "migrate:generate": "ts-node ./node_modules/.bin/typeorm migration:generate --config src/db/migrations-config -n",
+    "test:unit": "jest test/unit",
     "test:integration": "DB_NAME=todo_test yarn migrate && DB_NAME=todo_test jest test/integration"
   },
   "dependencies": {
