@@ -7,10 +7,10 @@ export async function errorHandler(ctx: Context, next: Koa.Next) {
     await next();
   } catch (error) {
     if (error instanceof AppError) {
-      ctx.body = error.message;
+      ctx.body = { message: error.message };
       ctx.status = error.code;
     } else {
-      ctx.message = 'Internal Server Error';
+      ctx.body = { message: 'Internal Server Error' };
       ctx.status = 500;
     }
   }

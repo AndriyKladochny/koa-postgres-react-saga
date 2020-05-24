@@ -68,17 +68,17 @@ describe('Todo API', () => {
       const taskData = {};
 
       const res = await request.post(`/_api/todo`).send(taskData).expect(400);
-      // Why error is not in body?
-      expect(res.text).toMatch(/title/gi);
-      expect(res.text).toMatch(/is required/gi);
+
+      expect(res.body.message).toMatch(/title/gi);
+      expect(res.body.message).toMatch(/is required/gi);
     });
 
     test('should return 500 error when saving to DB throws error', async () => {
       const taskData = { title: 'Write integration tests' };
       jest.spyOn(taskRepository, 'save').mockRejectedValueOnce('Custom error');
+
       const res = await request.post(`/_api/todo`).send(taskData).expect(500);
-      // Why error is not in body?
-      expect(res.text).toEqual('Internal Server Error');
+      expect(res.body.message).toEqual('Internal Server Error');
     });
   });
 
@@ -124,8 +124,7 @@ describe('Todo API', () => {
         .send(updatedTaskProps)
         .expect(500);
 
-      // Why error is not in body?
-      expect(res.text).toEqual('Internal Server Error');
+      expect(res.body.message).toEqual('Internal Server Error');
     });
   });
 
@@ -152,9 +151,9 @@ describe('Todo API', () => {
       jest
         .spyOn(taskRepository, 'delete')
         .mockRejectedValueOnce('Custom error');
+
       const res = await request.delete(`/_api/todo/${task.id}`).expect(500);
-      // Why error is not in body?
-      expect(res.text).toEqual('Internal Server Error');
+      expect(res.body.message).toEqual('Internal Server Error');
     });
   });
 });
